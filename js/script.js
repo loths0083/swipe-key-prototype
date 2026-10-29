@@ -131,25 +131,42 @@ swipeKey.addEventListener('pointerup', () => {
 });
 
 function executeAction(action) {
-    textInput.focus();
-
     if (action === 'selectAll') {
+        textInput.focus();
         textInput.select();
     } else if (action === 'copy') {
         const selectedText = textInput.value.substring(textInput.selectionStart, textInput.selectionEnd);
-        if (selectedText) {
+        if (selectedText && navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(selectedText).catch(err => {
-                console.error('Async Clipboard write failed: ', err);
+                console.error('Copy failed:', err);
             });
         }
     } else if (action === 'paste') {
-        navigator.clipboard.readText().then(text => {
-            const start = textInput.selectionStart;
-            const end = textInput.selectionEnd;
-            textInput.value = textInput.value.substring(0, start) + text + textInput.value.substring(end);
-            textInput.setSelectionRange(start + text.length, start + text.length);
-        }).catch(err => {
-            console.error('Async Clipboard read failed: ', err);
-        });
+        // Must call readText immediately without prior asynchronous delays or focus shifts
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(text => {
+                textInput.focus();
+                insertTextAtCursor(text);
+            }).catch(err => {
+                console.warn('Clipboard read restricted by iOS WebKit, falling back to focus:', err);
+                textInput.focus();
+                // Fallback: Trigger native paste menu or prompt user
+                try {
+                    document.execCommand('paste');
+                } catch (e) {
+                    // Safari iOS blocks execCommand paste, so we guide the user via native selection
+                    document.execCommand('insertText', false, ''); 
+                }
+            });
+        } else {
+            textInput.focus();
+        }
     }
+}
+
+function insertTextAtCursor(text) {
+    const start = textInput.selectionStart;
+    const end = textInput.selectionEnd;
+    textInput.value = textInput.value.substring(0, start) + text + textInput.value.substring(end);
+    textInput.setSelectionRange(start + text.length, start + text.length);
 }
