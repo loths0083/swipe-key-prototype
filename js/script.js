@@ -157,15 +157,11 @@ function executeAction(action) {
             }
         }
     } else if (action === 'paste') {
-        if (navigator.clipboard && navigator.clipboard.readText) {
-            navigator.clipboard.readText().then(text => {
-                insertTextAtCursor(text);
-            }).catch(err => {
-                insertTextAtCursor(internalClipboard);
-            });
-        } else {
+        navigator.clipboard.readText().then(text => {
+            insertTextAtCursor(text);
+        }).catch(err => {
             insertTextAtCursor(internalClipboard);
-        }
+        });
     }
 }
 
