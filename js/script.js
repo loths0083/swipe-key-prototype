@@ -9,6 +9,7 @@ let startY = 0;
 const threshold = 20;
 let currentAction = null;
 let isFocused = false;
+let internalClipboard = ''; // Mock clipboard for iOS fallback
 let cachedSelectionStart = 0;
 let cachedSelectionEnd = 0;
 
@@ -162,6 +163,7 @@ function executeAction(action) {
     } else if (action === 'copy') {
         const selectedText = textInput.value.substring(cachedSelectionStart, cachedSelectionEnd);
         if (selectedText) {
+            internalClipboard = selectedText;
             navigator.clipboard.writeText(selectedText).catch(err => {
                 console.error('Async Clipboard write failed: ', err);
             });
