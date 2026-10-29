@@ -6,9 +6,10 @@
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+    touch-action: manipulation;
 }
 
-/* Lock down html and body to be completely unscrollable */
+/* Lock down html and body to be completely unscrollable & non-zoomable */
 html, body {
     width: 100%;
     height: 100%;
@@ -18,6 +19,7 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
+    overscroll-behavior: none;
 }
 
 /* Screen-wide Notes App Container mimicking iOS Notes */
@@ -83,7 +85,7 @@ html, body {
     color: #ffffff;
     border: none;
     padding: 0;
-    font-size: 17px;
+    font-size: 17px; /* 17px prevents iOS Safari form-focus auto-zoom */
     line-height: 1.4;
     resize: none;
     outline: none;
@@ -94,7 +96,7 @@ html, body {
 
 /* Dynamic Bottom Toolbar Bar housing the Swipe Key */
 #bottom-toolbar {
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 0;
     width: 100%;
@@ -106,14 +108,12 @@ html, body {
     justify-content: space-between;
     padding: 0 20px;
     z-index: 1000;
-    transform: translateY(100%);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
 }
 
 #bottom-toolbar.visible {
-    transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
 }

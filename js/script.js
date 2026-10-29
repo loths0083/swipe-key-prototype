@@ -10,6 +10,10 @@ const threshold = 20;
 let currentAction = null;
 let isFocused = false;
 
+// Prevent pinch-zoom gestures on iOS Safari
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+
 // Neutralize WebKit native auto-scroll shift on focus
 function resetScrollPosition() {
     window.scrollTo(0, 0);
@@ -24,25 +28,31 @@ function updateLayoutAndToolbar() {
     if (!window.visualViewport) return;
     const vv = window.visualViewport;
 
+    // Match container dimensions precisely to the visual viewport
     appContainer.style.height = vv.height + 'px';
     appContainer.style.top = vv.offsetTop + 'px';
+    appContainer.style.left = vv.offsetLeft + 'px';
 
     const keyboardHeight = window.innerHeight - vv.height;
 
     if (isFocused) {
         bottomToolbar.classList.add('visible');
+        
+        // Pin toolbar directly to the bottom of the visual viewport (above the keyboard)
+        const toolbarTop = vv.offsetTop + vv.height - bottomToolbar.offsetHeight;
+        bottomToolbar.style.top = toolbarTop + 'px';
+        bottomToolbar.style.left = vv.offsetLeft + 'px';
+        bottomToolbar.style.width = vv.width + 'px';
+
         if (keyboardHeight > 50) {
-            bottomToolbar.style.bottom = keyboardHeight + 'px';
             indicator.classList.add('active');
             indicator.textContent = `Keyboard Active (${Math.round(keyboardHeight)}px)`;
         } else {
-            bottomToolbar.style.bottom = '0px';
             indicator.classList.add('active');
             indicator.textContent = 'Focus Mode (Desktop/No KB)';
         }
     } else {
         bottomToolbar.classList.remove('visible');
-        bottomToolbar.style.bottom = '0px';
         indicator.classList.remove('active');
         indicator.textContent = 'Keyboard Status: Closed';
     }
