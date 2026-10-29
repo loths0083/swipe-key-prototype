@@ -10,6 +10,8 @@ const threshold = 20;
 let currentAction = null;
 let isFocused = false;
 let internalClipboard = ''; // Mock clipboard for iOS fallback
+let cachedSelectionStart = 0;
+let cachedSelectionEnd = 0;
 
 // Prevent pinch-zoom gestures on iOS Safari
 document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -131,6 +133,14 @@ swipeKey.addEventListener('pointerup', () => {
     swipeKey.classList.remove('swiping-top', 'swiping-bottom', 'swiping-left');
 });
 
+// Track selection changes while typing or moving cursor
+textInput.addEventListener('selectionchange', () => {
+    if (document.activeElement === textInput) {
+        cachedSelectionStart = textInput.selectionStart;
+        cachedSelectionEnd = textInput.selectionEnd;
+    }
+});
+
 function executeAction(action) {
     textInput.focus();
 
@@ -161,8 +171,8 @@ function executeAction(action) {
 }
 
 function insertTextAtCursor(text) {
-    const start = textInput.selectionStart;
-    const end = textInput.selectionEnd;
+    const start = cachedSelectionStart;
+    const end = cachedSelectionEnd;
     textInput.value = textInput.value.substring(0, start) + text + textInput.value.substring(end);
     textInput.setSelectionRange(start + text.length, start + text.length);
 }
