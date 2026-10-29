@@ -9,13 +9,27 @@ let startY = 0;
 const threshold = 20;
 let currentAction = null;
 let isFocused = false;
-let internalClipboard = ''; // Mock clipboard for iOS fallback
 let cachedSelectionStart = 0;
 let cachedSelectionEnd = 0;
 
 // Prevent pinch-zoom gestures on iOS Safari
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('gesturechange', (e) => e.preventDefault());
+
+// Track selection changes to preserve cursor position when focus shifts
+textInput.addEventListener('selectionchange', () => {
+    if (document.activeElement === textInput) {
+        cachedSelectionStart = textInput.selectionStart;
+        cachedSelectionEnd = textInput.selectionEnd;
+    }
+});
+
+['keyup', 'click', 'input'].forEach(evt => {
+    textInput.addEventListener(evt, () => {
+        cachedSelectionStart = textInput.selectionStart;
+        cachedSelectionEnd = textInput.selectionEnd;
+    });
+});
 
 // Neutralize WebKit native auto-scroll shift on focus
 function resetScrollPosition() {
@@ -133,13 +147,15 @@ swipeKey.addEventListener('pointerup', () => {
     swipeKey.classList.remove('swiping-top', 'swiping-bottom', 'swiping-left');
 });
 
-// Track selection changes while typing or moving cursor
-textInput.addEventListener('selectionchange', () => {
-    if (document.activeElement === textInput) {
-        cachedSelectionStart = textInput.selectionStart;
-        cachedSelectionEnd = textInput.selectionEnd;
-    }
-});
+function insertTextAtCursor(text) {
+    const start = cachedSelectionStart;
+    const end = cachedSelectionEnd;
+    textInput.value = textInput.value.substring(0, start) + text + textInput.value.substring(end);
+    const newPos = start + text.length;
+    textInput.setSelectionRange(newPos, newPos);
+    cachedSelectionStart = newPos;
+    cachedSelectionEnd = newPos;
+}
 
 function executeAction(action) {
     textInput.focus();
@@ -147,14 +163,11 @@ function executeAction(action) {
     if (action === 'selectAll') {
         textInput.select();
     } else if (action === 'copy') {
-        const selectedText = textInput.value.substring(textInput.selectionStart, textInput.selectionEnd);
+        const selectedText = textInput.value.substring(cachedSelectionStart, cachedSelectionEnd);
         if (selectedText) {
-            internalClipboard = selectedText;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(selectedText).catch(err => {
-                    console.error('Async Clipboard write failed: ', err);
-                });
-            }
+            navigator.clipboard.writeText(selectedText).catch(err => {
+                console.error('Async Clipboard write failed: ', err);
+            });
         }
     } else if (action === 'paste') {
         insertTextAtCursor(internalClipboard);
