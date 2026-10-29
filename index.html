@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iOS Notes Swipe Toolbar Prototype</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container" id="app-container">
+        <!-- Notes App Header -->
+        <div class="app-header">
+            <h2>Notes</h2>
+            <div id="keyboard-indicator">Keyboard Status: Closed</div>
+        </div>
+
+        <!-- Screen-wide Textbox Area -->
+        <div class="editor-wrapper">
+            <textarea id="text-input" placeholder="Type a note..."></textarea>
+        </div>
+
+        <!-- Fixed Bottom Toolbar containing the Swipe Key -->
+        <div id="bottom-toolbar">
+            <span class="toolbar-label">Swipe Key Bar</span>
+            <div id="swipe-trigger-key">
+                Swipe
+                <div class="action-popup top">Copy (Up)</div>
+                <div class="action-popup bottom">Paste (Down)</div>
+                <div class="action-popup left">Select All (Left)</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
