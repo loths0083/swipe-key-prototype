@@ -170,13 +170,10 @@ function executeAction(action) {
             });
         }
     } else if (action === 'paste') {
-        insertTextAtCursor(internalClipboard);
+        navigator.clipboard.readText().then(text => {
+            insertTextAtCursor(text);
+        }).catch(err => {
+            console.error('Async Clipboard read failed: ', err);
+        });
     }
-}
-
-function insertTextAtCursor(text) {
-    const start = cachedSelectionStart;
-    const end = cachedSelectionEnd;
-    textInput.value = textInput.value.substring(0, start) + text + textInput.value.substring(end);
-    textInput.setSelectionRange(start + text.length, start + text.length);
 }
