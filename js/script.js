@@ -151,10 +151,7 @@ function insertTextAtCursor(text) {
     const start = cachedSelectionStart;
     const end = cachedSelectionEnd;
     textInput.value = textInput.value.substring(0, start) + text + textInput.value.substring(end);
-    const newPos = start + text.length;
-    textInput.setSelectionRange(newPos, newPos);
-    cachedSelectionStart = newPos;
-    cachedSelectionEnd = newPos;
+    textInput.setSelectionRange(start + text.length, start + text.length);
 }
 
 function executeAction(action) {
