@@ -157,16 +157,15 @@ function executeAction(action) {
             }
         }
     } else if (action === 'paste') {
-        // if (navigator.clipboard && navigator.clipboard.readText) {
-        //     navigator.clipboard.readText().then(text => {
-        //         insertTextAtCursor(text);
-        //     }).catch(err => {
-        //         insertTextAtCursor(internalClipboard);
-        //     });
-        // } else {
-        //     insertTextAtCursor(internalClipboard);
-        // }
-        insertTextAtCursor(internalClipboard);
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(text => {
+                insertTextAtCursor(text);
+            }).catch(err => {
+                insertTextAtCursor(internalClipboard);
+            });
+        } else {
+            insertTextAtCursor(internalClipboard);
+        }
     }
 }
 
