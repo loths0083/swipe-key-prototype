@@ -124,10 +124,10 @@ swipeKey.addEventListener('pointermove', (e) => {
     if (distance > threshold) {
         const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
 
-        if (angle >= -150 && angle <= -30) {
+        if (angle > -150 && angle < -30) {
             currentAction = 'copy';
             swipeKey.classList.add('swiping-top');
-        } else if (angle >= 30 && angle <= 150) {
+        } else if (angle > 30 && angle < 150) {
             currentAction = 'paste';
             swipeKey.classList.add('swiping-bottom');
         } else {
@@ -171,11 +171,4 @@ function executeAction(action) {
     } else if (action === 'paste') {
         insertTextAtCursor(internalClipboard);
     }
-}
-
-function insertTextAtCursor(text) {
-    const start = cachedSelectionStart;
-    const end = cachedSelectionEnd;
-    textInput.value = textInput.value.substring(0, start) + text + textInput.value.substring(end);
-    textInput.setSelectionRange(start + text.length, start + text.length);
 }
